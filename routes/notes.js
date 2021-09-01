@@ -2,6 +2,7 @@ const notes = require("express").Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
+// Route loads stored notes and places them on the page.
 notes.get("/", (req, res) => {
   fs.readFile("./db/db.json", (err, data) => {
     if (err) {
@@ -12,6 +13,8 @@ notes.get("/", (req, res) => {
   });
 });
 
+// Route will take the submitted note, add a unique id to the note, read the database file,
+// append the submitted note to the end, and write the changes back to the database file.
 notes.post("/", (req, res) => {
   const { title, text } = req.body;
   if (req.body) {
@@ -47,6 +50,7 @@ notes.post("/", (req, res) => {
   }
 });
 
+// Route that will delete the store note and update the page to reflect the change.
 notes.delete("/:id", (req, res) => {
   const id = req.params.id;
   fs.readFile("./db/db.json", (err, data) => {
