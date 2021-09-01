@@ -47,13 +47,28 @@ notes.post("/", (req, res) => {
   }
 });
 
-notes.delete("/api/notes/:id", (req, res) => {
+notes.delete("/:id", (req, res) => {
   const id = req.params.id;
   fs.readFile("./db/db.json", (err, data) => {
     if (err) {
       console.log(err);
     } else {
-      
+      parsedData = JSON.parse(data);
+      filteredData = parsedData.filter((note) => note.id !== id)
+      strData = JSON.stringify(filteredData)
+      fs.writeFile("./db/db.json", strData, (err) => {
+        if (err) {
+          throw err;
+        } else {
+          fs.readFile("./db/db.json", (err, data) => {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json(JSON.parse(data));
+            }
+          });
+        }
+      });
     }
   });
 });
