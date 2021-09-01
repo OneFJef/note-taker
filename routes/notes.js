@@ -1,15 +1,18 @@
 const notes = require("express").Router();
-const fs = require("fs").promises;
+const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
 notes.get("/", (req, res) => {
-  fs.readFile("./db/db.json").then((data) => {
-    res.json(JSON.parse(data));
+  fs.readFile("./db/db.json", (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(JSON.parse(data));
+    }
   });
 });
 
 notes.post("/", (req, res) => {
-  console.log(req.body);
   const { title, text } = req.body;
   if (req.body) {
     const newNote = {
@@ -17,16 +20,28 @@ notes.post("/", (req, res) => {
       text,
       id: uuidv4(),
     };
-    console.log({ newNote });
-    // fs.readFile("./db/db.json")
-    //   .then((data) => {
-    //     JSON.parse(data);
-    //   })
-    //   .then((parsedData) => {
-    //     console.log(typeof parsedData);
-    //     parsedData.push(newNote);
-    //     fs.writeFile("./db/db.json", parsedData);
-    //   });
+    fs.readFile("./db/db.json", (err, data) => {
+      if (err) {
+        throw err;
+      } else {
+        parsedData = JSON.parse(data);
+        parsedData.push(newNote);
+        strData = JSON.stringify(parsedData);
+        fs.writeFile("./db/db.json", strData, (err) => {
+          if (err) {
+            throw err;
+          } else {
+            fs.readFile("./db/db.json", (err, data) => {
+              if (err) {
+                console.log(err);
+              } else {
+                res.json(JSON.parse(data));
+              }
+            });
+          }
+        });
+      }
+    });
   } else {
     res.error("Error saving note.");
   }
@@ -34,15 +49,13 @@ notes.post("/", (req, res) => {
 
 notes.delete("/api/notes/:id", (req, res) => {
   const id = req.params.id;
-//   fs.readFile("./db/db.json")
-//     .then((data) => {
-//       JSON.parse(data);
-//     })
-//     .then((parsedData) => {
-//       const filteredData = parsedData.filter((note) => note.id !== id);
-//       fs.writeFile("./db/db.json", filteredData);
-//       res.json(`Note ${id} has been deleted.`);
-//     });
+  fs.readFile("./db/db.json", (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      
+    }
+  });
 });
 
 module.exports = notes;
